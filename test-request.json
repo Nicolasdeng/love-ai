@@ -1,0 +1,11 @@
+{
+  "scene": "daily",
+  "gender": "female",
+  "relationship": "dating",
+  "messages": [
+    {
+      "role": "other",
+      "content": "今天好累啊，工作好多"
+    }
+  ]
+}
