@@ -1,21 +1,14 @@
-
 server:
   port: 8999
   tomcat:
     uri-encoding: UTF-8
+
 spring:
   application:
     name: loveai
-  ai:
-    dashscope:
-      api-key: sk-b2eb6924c09241dcb86121acf7f4132b
-      chat:
-        options:
-          model: qwen-plus
-      embedding:
-        options:
-          model: text-embedding-v3 #向量模型
-          dimensions: 1024 #向量维度维度
+  profiles:
+    active: local
+
 logging:
   level:
     org:
