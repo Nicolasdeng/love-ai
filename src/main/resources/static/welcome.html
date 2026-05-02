@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>恋爱聊天助手 - 欢迎</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .welcome-box {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+        }
+        h1 {
+            color: #667eea;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        .status {
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .status-item:last-child { border-bottom: none; }
+        .status-label { font-weight: 600; color: #555; }
+        .status-value { color: #4caf50; font-weight: bold; }
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 18px;
+            margin: 10px;
+            transition: transform 0.2s;
+        }
+        .btn:hover { transform: translateY(-3px); }
+        .api-list {
+            text-align: left;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 10px;
+        }
+        .api-item {
+            padding: 8px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .method {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .post { background: #4caf50; color: white; }
+        .get { background: #2196f3; color: white; }
+    </style>
+</head>
+<body>
+    <div class="welcome-box">
+        <h1>💕 恋爱聊天助手</h1>
+        <p style="color: #666; font-size: 16px; margin-bottom: 20px;">
+            基于AI的智能恋爱沟通助手
+        </p>
+
+        <div class="status">
+            <div class="status-item">
+                <span class="status-label">后端服务</span>
+                <span class="status-value" id="backend-status">检测中...</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">API地址</span>
+                <span class="status-value">http://localhost:8089/api</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">前端地址</span>
+                <span class="status-value">http://localhost:8089</span>
+            </div>
+        </div>
+
+        <a href="/index.html" class="btn">🚀 进入测试平台</a>
+
+        <div class="api-list">
+            <h3 style="margin-bottom: 15px;">📡 可用接口</h3>
+            <div class="api-item">
+                <span class="method post">POST</span>
+                <span>/api/user/register</span> - 用户注册
+            </div>
+            <div class="api-item">
+                <span class="method post">POST</span>
+                <span>/api/user/login</span> - 用户登录
+            </div>
+            <div class="api-item">
+                <span class="method post">POST</span>
+                <span>/api/chat/suggest</span> - 聊天建议
+            </div>
+            <div class="api-item">
+                <span class="method post">POST</span>
+                <span>/api/chat/analyze</span> - 对话分析
+            </div>
+            <div class="api-item">
+                <span class="method post">POST</span>
+                <span>/api/chat/simulate</span> - 情境模拟
+            </div>
+            <div class="api-item">
+                <span class="method get">GET</span>
+                <span>/api/target/list</span> - 档案列表
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 检测后端服务状态
+        fetch('http://localhost:8089/api/user/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone: '', password: '' })
+        })
+        .then(() => {
+            document.getElementById('backend-status').textContent = '✅ 运行中';
+        })
+        .catch(() => {
+            document.getElementById('backend-status').textContent = '❌ 未启动';
+            document.getElementById('backend-status').style.color = '#f44336';
+        });
+    </script>
+</body>
+</html>

@@ -12,6 +12,7 @@ public class ChatAiApplication {
         log.info("启动");
         SpringApplication.run(ChatAiApplication.class, args);
         System.out.println("项目启动成功");
+        System.out.println("前端登录接口: http://localhost:8089/");
     }
 
 }

@@ -95,4 +95,36 @@ public class PromptTemplates {
 
         return prompt.toString();
     }
+
+    /**
+     * 构建对话分析Prompt
+     */
+    public static String buildAnalyzePrompt(String conversationText) {
+        return SYSTEM_ROLE + "\n\n" +
+                "【任务】请对下面的对话进行深入分析，评估沟通质量和情绪走向。\n\n" +
+                "【对话记录】\n" + conversationText + "\n\n" +
+                "请按以下JSON格式返回分析结果，不要添加其他文字：\n" +
+                "{\n" +
+                "  \"emotionTrend\": \"对话情绪走向描述（正向/负向/波动等）\",\n" +
+                "  \"qualityScore\": 75,\n" +
+                "  \"problems\": [\"沟通问题1\", \"沟通问题2\"],\n" +
+                "  \"suggestions\": [\"改进建议1\", \"改进建议2\"],\n" +
+                "  \"turningPoints\": [\n" +
+                "    {\"index\": 3, \"content\": \"关键消息内容\", \"reason\": \"为什么是转折点\"}\n" +
+                "  ]\n" +
+                "}\n";
+    }
+
+    /**
+     * 构建情境模拟Prompt（AI扮演对方）
+     */
+    public static String buildSimulateSystemPrompt(String scenario, String targetGender,
+                                                    String relationship, String targetPersonality) {
+        return "你现在要扮演一个" + targetGender + "性，在「" + scenario + "」场景下与用户互动。\n" +
+                "当前关系：" + relationship + "\n" +
+                (targetPersonality != null ? "性格特点：" + targetPersonality + "\n" : "") +
+                "请以真实自然的语气回复，就像真正的恋爱对象一样。\n" +
+                "每次回复后，在回复末尾用【反馈】标签附上对用户回复质量的简短点评（不超过30字）。\n" +
+                "格式：\n正常对话内容\n【反馈】对这条回复的评价";
+    }
 }

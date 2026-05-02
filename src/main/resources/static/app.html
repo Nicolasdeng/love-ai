@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>恋爱聊天助手</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #f5f7fa;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-size: 24px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logout-btn {
+            padding: 8px 20px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid white;
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .logout-btn:hover {
+            background: white;
+            color: #667eea;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .nav-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+        }
+        .nav-tab:hover {
+            background: #f5f7fa;
+        }
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .panel {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .panel.active {
+            display: block;
+        }
+        .panel h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        .btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .result-box {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .result-box h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        .suggestion-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+        .suggestion-item .tone {
+            display: inline-block;
+            padding: 3px 10px;
+            background: #667eea;
+            color: white;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+        .suggestion-item .text {
+            color: #333;
+            line-height: 1.6;
+        }
+        .emotion-box {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        .profile-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .profile-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+        .profile-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .profile-card p {
+            color: #666;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>💕 恋爱聊天助手</h1>
+        <div class="user-info">
+            <span id="user-nickname">加载中...</span>
+            <button class="logout-btn" onclick="logout()">退出登录</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchPanel('suggest')">聊天建议</button>
+            <button class="nav-tab" onclick="switchPanel('analyze')">对话分析</button>
+            <button class="nav-tab" onclick="switchPanel('simulate')">情境模拟</button>
+            <button class="nav-tab" onclick="switchPanel('profile')">档案管理</button>
+        </div>
+
+        <!-- 聊天建议 -->
+        <div id="suggest-panel" class="panel active">
+            <h2>💬 获取聊天回复建议</h2>
+            <form onsubmit="getSuggestions(event)">
+                <div class="form-group">
+                    <label>聊天场景</label>
+                    <select id="suggest-scene">
+                        <option value="initial">初次认识</option>
+                        <option value="daily" selected>日常聊天</option>
+                        <option value="date">约会中</option>
+                        <option value="conflict">发生矛盾</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>对方性别</label>
+                    <select id="suggest-gender">
+                        <option value="female">女</option>
+                        <option value="male">男</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>关系阶段</label>
+                    <select id="suggest-relationship">
+                        <option value="stranger">陌生人</option>
+                        <option value="friend">朋友</option>
+                        <option value="dating" selected>恋爱中</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>对方最后一条消息</label>
+                    <textarea id="suggest-message" placeholder="例如：今天好累啊" required></textarea>
+                </div>
+                <button type="submit" class="btn" id="suggest-btn">获取建议</button>
+            </form>
+            <div id="suggest-result"></div>
+        </div>
+
+        <!-- 对话分析 -->
+        <div id="analyze-panel" class="panel">
+            <h2>📊 对话质量分析</h2>
+            <form onsubmit="analyzeChat(event)">
+                <div class="form-group">
+                    <label>对话记录（每行一条，格式：我: 消息内容 或 对方: 消息内容）</label>
+                    <textarea id="analyze-conversation" rows="8" placeholder="我: 你在干嘛&#10;对方: 在加班&#10;我: 辛苦了" required></textarea>
+                </div>
+                <button type="submit" class="btn" id="analyze-btn">分析对话</button>
+            </form>
+            <div id="analyze-result"></div>
+        </div>
+
+        <!-- 情境模拟 -->
+        <div id="simulate-panel" class="panel">
+            <h2>🎭 情境模拟练习</h2>
+            <form onsubmit="simulate(event)">
+                <div class="form-group">
+                    <label>模拟场景</label>
+                    <select id="sim-scenario">
+                        <option value="confession">初次表白</option>
+                        <option value="date_invite">约会邀请</option>
+                        <option value="conflict">矛盾化解</option>
+                        <option value="comfort">情绪安抚</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>对方性别</label>
+                    <select id="sim-gender">
+                        <option value="female">女</option>
+                        <option value="male">男</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>你想说的话</label>
+                    <textarea id="sim-message" placeholder="输入你想对TA说的话" required></textarea>
+                </div>
+                <button type="submit" class="btn" id="sim-btn">发送</button>
+            </form>
+            <div id="sim-result"></div>
+        </div>
+
+        <!-- 档案管理 -->
+        <div id="profile-panel" class="panel">
+            <h2>📁 对象档案管理</h2>
+            <form onsubmit="createProfile(event)">
+                <div class="form-group">
+                    <label>昵称</label>
+                    <input type="text" id="profile-nickname" placeholder="对方的昵称" required>
+                </div>
+                <div class="form-group">
+                    <label>性别</label>
+                    <select id="profile-gender">
+                        <option value="female">女</option>
+                        <option value="male">男</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn" id="profile-btn">创建档案</button>
+            </form>
+            <div id="profile-result"></div>
+            <hr style="margin: 30px 0; border: none; border-top: 1px solid #e0e0e0;">
+            <button class="btn" onclick="loadProfiles()">查看所有档案</button>
+            <div id="profile-list" class="profile-list"></div>
+        </div>
+    </div>
+
+    <script src="/app.js"></script>
+</body>
+</html>

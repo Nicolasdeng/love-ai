@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>恋爱聊天助手 - API测试</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 { color: white; text-align: center; margin-bottom: 30px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .tab.active { background: white; color: #667eea; }
+        .panel { display: none; background: white; border-radius: 12px; padding: 30px; }
+        .panel.active { display: block; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+        }
+        textarea { min-height: 80px; }
+        button {
+            padding: 10px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .response pre { white-space: pre-wrap; word-wrap: break-word; }
+        .auth-info { background: #e8f5e9; padding: 10px; border-radius: 6px; margin-top: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💕 恋爱聊天助手测试平台</h1>
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('login')">登录注册</button>
+            <button class="tab" onclick="switchTab('suggest')">聊天建议</button>
+            <button class="tab" onclick="switchTab('analyze')">对话分析</button>
+            <button class="tab" onclick="switchTab('simulate')">情境模拟</button>
+            <button class="tab" onclick="switchTab('profile')">档案管理</button>
+        </div>
+
+        <!-- 登录注册 -->
+        <div id="login" class="panel active">
+            <h2>用户注册</h2>
+            <input type="text" id="reg_phone" placeholder="手机号 13800138000"><br><br>
+            <input type="password" id="reg_password" placeholder="密码"><br><br>
+            <input type="text" id="reg_nickname" placeholder="昵称（可选）"><br><br>
+            <button onclick="register()">注册</button>
+            <hr style="margin: 20px 0;">
+            <h2>用户登录</h2>
+            <input type="text" id="login_phone" placeholder="手机号"><br><br>
+            <input type="password" id="login_password" placeholder="密码"><br><br>
+            <button onclick="login()">登录</button>
+            <div id="auth_info" class="auth-info" style="display:none;">
+                <strong>已登录</strong><br>Token: <span id="token_display"></span>
+            </div>
+            <div id="login_response" class="response"></div>
+        </div>
+
+        <!-- 聊天建议 -->
+        <div id="suggest" class="panel">
+            <h2>获取聊天回复建议</h2>
+            <select id="suggest_scene">
+                <option value="initial">初次认识</option>
+                <option value="daily">日常聊天</option>
+                <option value="date">约会中</option>
+            </select><br><br>
+            <select id="suggest_gender">
+                <option value="female">女</option>
+                <option value="male">男</option>
+            </select><br><br>
+            <select id="suggest_relationship">
+                <option value="stranger">陌生人</option>
+                <option value="friend">朋友</option>
+                <option value="dating">恋爱中</option>
+            </select><br><br>
+            <textarea id="suggest_messages" placeholder='对话历史JSON: [{"role":"other","content":"今天好累啊"}]'></textarea><br><br>
+            <button onclick="getSuggestions()">获取建议</button>
+            <div id="suggest_response" class="response"></div>
+        </div>
+
+        <!-- 对话分析 -->
+        <div id="analyze" class="panel">
+            <h2>对话分析</h2>
+            <textarea id="analyze_conversation" placeholder='对话JSON: [{"role":"user","content":"你在干嘛"},{"role":"other","content":"在加班"}]'></textarea><br><br>
+            <button onclick="analyzeChat()">分析对话</button>
+            <div id="analyze_response" class="response"></div>
+        </div>
+
+        <!-- 情境模拟 -->
+        <div id="simulate" class="panel">
+            <h2>情境模拟练习</h2>
+            <select id="sim_scenario">
+                <option value="confession">初次表白</option>
+                <option value="date_invite">约会邀请</option>
+                <option value="conflict">矛盾化解</option>
+            </select><br><br>
+            <select id="sim_gender">
+                <option value="female">女</option>
+                <option value="male">男</option>
+            </select><br><br>
+            <textarea id="sim_message" placeholder="输入你想说的话"></textarea><br><br>
+            <button onclick="simulate()">发送</button>
+            <div id="simulate_response" class="response"></div>
+        </div>
+
+        <!-- 档案管理 -->
+        <div id="profile" class="panel">
+            <h2>对象档案管理</h2>
+            <h3>创建档案</h3>
+            <input type="text" id="profile_nickname" placeholder="昵称"><br><br>
+            <select id="profile_gender">
+                <option value="female">女</option>
+                <option value="male">男</option>
+            </select><br><br>
+            <button onclick="createProfile()">创建档案</button>
+            <hr style="margin: 20px 0;">
+            <h3>档案列表</h3>
+            <button onclick="listProfiles()">查看所有档案</button>
+            <div id="profile_response" class="response"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8089/api';
+        let token = localStorage.getItem('token') || '';
+
+        if (token) {
+            document.getElementById('auth_info').style.display = 'block';
+            document.getElementById('token_display').textContent = token.substring(0, 30) + '...';
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        async function apiCall(endpoint, method, data, needAuth = true) {
+            const headers = { 'Content-Type': 'application/json' };
+            if (needAuth && token) headers['Authorization'] = 'Bearer ' + token;
+
+            try {
+                const response = await fetch(API_BASE + endpoint, {
+                    method, headers,
+                    body: data ? JSON.stringify(data) : null
+                });
+                return await response.json();
+            } catch (error) {
+                return { code: 500, message: '请求失败: ' + error.message };
+            }
+        }
+
+        async function register() {
+            const data = {
+                phone: document.getElementById('reg_phone').value,
+                password: document.getElementById('reg_password').value,
+                nickname: document.getElementById('reg_nickname').value
+            };
+            const result = await apiCall('/user/register', 'POST', data, false);
+            document.getElementById('login_response').innerHTML = '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+        }
+
+        async function login() {
+            const data = {
+                phone: document.getElementById('login_phone').value,
+                password: document.getElementById('login_password').value
+            };
+            const result = await apiCall('/user/login', 'POST', data, false);
+            if (result.code === 200 && result.data.token) {
+                token = result.data.token;
+                localStorage.setItem('token', token);
+                document.getElementById('auth_info').style.display = 'block';
+                document.getElementById('token_display').textContent = token.substring(0, 30) + '...';
+            }
+            document.getElementById('login_response').innerHTML = '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+        }
+
+        async function getSuggestions() {
+            const messages = document.getElementById('suggest_messages').value;
+            const data = {
+                scene: document.getElementById('suggest_scene').value,
+                gender: document.getElementById('suggest_gender').value,
+                relationship: document.getElementById('suggest_relationship').value,
+                messages: messages ? JSON.parse(messages) : []
+            };
+            const result = await apiCall('/chat/suggest', 'POST', data, false);
+            document.getElementById('suggest_response').innerHTML = '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+        }
+
+        async function analyzeChat() {
+            const conversation = document.getElementById('analyze_conversation').value;
+            const data = { conversation: JSON.parse(conversation) };
+            const result = await apiCall('/chat/analyze', 'POST', data);
+            document.getElementById('analyze_response').innerHTML = '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+        }
+
+        async function simulate() {
+            const data = {
+                scenario: document.getElementById('sim_scenario').value,
+                targetGender: document.getElementById('sim_gender').value,
+                relationship: 'dating',
+                userMessage: document.getElementById('sim_message').value
+            };
+            const result = await apiCall('/chat/simulate', 'POST', data);
+            document.getElementById('simulate_response').innerHTML = '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+        }
+
+        async function createProfile() {
+            const data = {
+                nickname: document.getElementById('profile_nickname').value,
+                gender: document.getElementById('profile_gender').value
+            };
+            const result = await apiCall('/target/create', 'POST', data);
+            document.getElementById('profile_response').innerHTML = '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+        }
+
+        async function listProfiles() {
+            const result = await apiCall('/target/list', 'GET');
+            document.getElementById('profile_response').innerHTML = '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+        }
+    </script>
+</body>
+</html>
